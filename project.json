@@ -1,0 +1,29 @@
+{
+  "overview": "Clutch & Charm is a modern eCommerce website for a handmade hair accessories brand. Features a product gallery, WhatsApp ordering, brand story, and social media integration — all wrapped in a cute pink and pastel feminine design.",
+  "features": [
+    "Product gallery with 12 handmade hair clutchers",
+    "WhatsApp order button with pre-filled messages",
+    "Shopping cart with localStorage persistence",
+    "Home hero banner with featured products",
+    "About Us with brand story and craftsmanship details",
+    "Contact page with WhatsApp and Instagram links",
+    "Pink and pastel feminine design system",
+    "Mobile-first responsive layout",
+    "SEO meta tags on all pages",
+    "Instagram feed integration"
+  ],
+  "category": "ecommerce",
+  "tags": [
+    "ecommerce",
+    "hair-accessories",
+    "handmade",
+    "feminine",
+    "pink",
+    "shop",
+    "whatsapp",
+    "instagram",
+    "mobile-friendly",
+    "boutique"
+  ],
+  "last_updated": "2026-04-10T10:10:58.637Z"
+}

@@ -1,0 +1,17 @@
+type Product = 
+ record {
+   category: text;
+   description: text;
+   featured: bool;
+   id: nat;
+   image: text;
+   materials: text;
+   name: text;
+   price: float64;
+ };
+service : {
+  getFeaturedProducts: () -> (vec Product) query;
+  getProductById: (id: nat) -> (opt Product) query;
+  getProducts: () -> (vec Product) query;
+  getProductsByCategory: (category: text) -> (vec Product) query;
+}
