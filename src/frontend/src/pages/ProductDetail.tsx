@@ -1,21 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect } from "react";
 import { SiWhatsapp } from "react-icons/si";
-import { getProductById, products } from "../data/products";
+import { useProduct, useProducts } from "../hooks/useQueries";
 import { useCartStore } from "../stores/cart";
 import { setPageMeta } from "../utils/seo";
 
-const WHATSAPP_NUMBER = "923001234567";
+const WHATSAPP_NUMBER = "919876543210";
 
 const CATEGORY_COLORS: Record<string, string> = {
-  clutchers: "bg-pink-100 text-pink-700 border-pink-200",
-  clips: "bg-purple-100 text-purple-700 border-purple-200",
-  bows: "bg-rose-100 text-rose-700 border-rose-200",
-  sets: "bg-amber-100 text-amber-700 border-amber-200",
+  Florals: "bg-pink-100 text-pink-700 border-pink-200",
+  Pastels: "bg-purple-100 text-purple-700 border-purple-200",
+  Boho: "bg-amber-100 text-amber-700 border-amber-200",
+  Metallics: "bg-yellow-100 text-yellow-700 border-yellow-200",
 };
 
 function MaterialChip({ label }: { label: string }) {
@@ -26,10 +27,57 @@ function MaterialChip({ label }: { label: string }) {
   );
 }
 
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="bg-muted/20 border-b border-border py-3">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <Skeleton className="h-4 w-48" />
+        </div>
+      </div>
+      <section className="py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <Skeleton className="h-8 w-28 mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+            <Skeleton className="aspect-square rounded-3xl" />
+            <div className="flex flex-col gap-5">
+              <div className="flex gap-2">
+                <Skeleton className="h-7 w-20 rounded-full" />
+              </div>
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-9 w-24" />
+              <Skeleton className="h-px w-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-4 w-4/5" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <div className="flex gap-2 flex-wrap">
+                  <Skeleton className="h-7 w-24 rounded-full" />
+                  <Skeleton className="h-7 w-20 rounded-full" />
+                  <Skeleton className="h-7 w-28 rounded-full" />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Skeleton className="h-12 flex-1 rounded-xl" />
+                <Skeleton className="h-12 flex-1 rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function ProductDetail() {
   const { productId } = useParams({ from: "/shop/$productId" });
   const id = Number(productId);
-  const product = getProductById(id);
+
+  const { data: product, isLoading, isError } = useProduct(id);
+  const { data: allProducts = [] } = useProducts();
   const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
@@ -41,7 +89,9 @@ export default function ProductDetail() {
     }
   }, [product]);
 
-  if (!product) {
+  if (isLoading) return <LoadingSkeleton />;
+
+  if (isError || !product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background p-8 text-center">
         <span className="text-5xl">😕</span>
@@ -59,7 +109,7 @@ export default function ProductDetail() {
   }
 
   const whatsAppMsg = encodeURIComponent(
-    `Hi Clutch & Charm! 🌸 I'd like to order: ${product.name} ($${product.price.toFixed(2)}). Please let me know the next steps!`,
+    `Hi! I want to order: ${product.name} at \u20B9${product.price}. Please let me know the next steps!`,
   );
 
   const materials = product.materials
@@ -67,7 +117,7 @@ export default function ProductDetail() {
     .map((m) => m.trim())
     .filter(Boolean);
 
-  const related = products
+  const related = allProducts
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 3);
 
@@ -140,7 +190,7 @@ export default function ProductDetail() {
               {/* Category badge */}
               <div className="flex flex-wrap gap-2">
                 <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full border capitalize ${badgeClass}`}
+                  className={`text-xs font-medium px-3 py-1 rounded-full border ${badgeClass}`}
                 >
                   {product.category}
                 </span>
@@ -156,7 +206,7 @@ export default function ProductDetail() {
               </h1>
 
               <p className="text-3xl font-display font-bold text-primary">
-                ${product.price.toFixed(2)}
+                ₹{product.price}
               </p>
 
               <Separator />
@@ -214,7 +264,7 @@ export default function ProductDetail() {
               </div>
 
               <p className="text-xs text-muted-foreground text-center border border-dashed border-border rounded-xl py-2.5 px-4">
-                💌 Free gift wrapping on orders over $25 &nbsp;·&nbsp; 🚚
+                💌 Free gift wrapping on orders over ₹500 &nbsp;·&nbsp; 🚚
                 Delivered with care
               </p>
             </motion.div>
@@ -256,7 +306,7 @@ export default function ProductDetail() {
                         {p.name}
                       </p>
                       <p className="text-base font-bold text-primary mt-1">
-                        ${p.price.toFixed(2)}
+                        ₹{p.price}
                       </p>
                     </div>
                   </Link>

@@ -1,22 +1,21 @@
 import Types "../types/products";
 import ProductLib "../lib/products";
 import List "mo:core/List";
-import Runtime "mo:core/Runtime";
 
 mixin (products : List.List<Types.Product>) {
   public query func getProducts() : async [Types.Product] {
-    Runtime.trap("not implemented");
+    ProductLib.getAll(products)
   };
 
   public query func getFeaturedProducts() : async [Types.Product] {
-    Runtime.trap("not implemented");
+    ProductLib.getFeatured(products)
   };
 
   public query func getProductById(id : Nat) : async ?Types.Product {
-    Runtime.trap("not implemented");
+    ProductLib.getById(products, id)
   };
 
   public query func getProductsByCategory(category : Text) : async [Types.Product] {
-    Runtime.trap("not implemented");
+    ProductLib.getByCategory(products, category)
   };
 };

@@ -11,27 +11,27 @@ import { Link } from "@tanstack/react-router";
 import { ShoppingBag, SlidersHorizontal } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import { products } from "../data/products";
+import { useProducts } from "../hooks/useQueries";
 import { useCartStore } from "../stores/cart";
 import type { Product } from "../types/product";
 import { setPageMeta } from "../utils/seo";
 
-type FilterTab = "all" | "clutchers" | "clips" | "bows" | "sets";
+type FilterTab = "all" | "Florals" | "Boho" | "Pastels" | "Metallics";
 type SortOption = "newest" | "price-asc" | "price-desc" | "best-sellers";
 
 const FILTER_TABS: { label: string; value: FilterTab; emoji: string }[] = [
   { label: "All", value: "all", emoji: "🌈" },
-  { label: "Clutchers", value: "clutchers", emoji: "🌸" },
-  { label: "Clips", value: "clips", emoji: "🦋" },
-  { label: "Bows", value: "bows", emoji: "🎀" },
-  { label: "Sets", value: "sets", emoji: "✨" },
+  { label: "Florals", value: "Florals", emoji: "🌸" },
+  { label: "Pastels", value: "Pastels", emoji: "🎀" },
+  { label: "Metallics", value: "Metallics", emoji: "✨" },
+  { label: "Boho", value: "Boho", emoji: "🦋" },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  clutchers: "bg-pink-100 text-pink-700 border-pink-200",
-  clips: "bg-purple-100 text-purple-700 border-purple-200",
-  bows: "bg-rose-100 text-rose-700 border-rose-200",
-  sets: "bg-amber-100 text-amber-700 border-amber-200",
+  Florals: "bg-pink-100 text-pink-700 border-pink-200",
+  Boho: "bg-amber-100 text-amber-700 border-amber-200",
+  Pastels: "bg-purple-100 text-purple-700 border-purple-200",
+  Metallics: "bg-yellow-100 text-yellow-700 border-yellow-200",
 };
 
 function ProductCard({ product, index }: { product: Product; index: number }) {
@@ -68,12 +68,12 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
       <div className="p-4 flex flex-col gap-2 flex-1">
         <div className="flex items-center justify-between gap-2">
           <span
-            className={`text-xs font-medium px-2.5 py-0.5 rounded-full border capitalize ${badgeClass}`}
+            className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${badgeClass}`}
           >
             {product.category}
           </span>
           <span className="text-lg font-display font-bold text-primary">
-            ${product.price.toFixed(2)}
+            ₹{product.price}
           </span>
         </div>
 
@@ -150,15 +150,14 @@ function SkeletonCard() {
 export default function Shop() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
-  const [loading, setLoading] = useState(true);
+
+  const { data: products = [], isLoading, isError, error } = useProducts();
 
   useEffect(() => {
     setPageMeta(
       "Shop",
       "Browse our full collection of handmade girls hair clutchers, clips, bows and sets at Clutch & Charm.",
     );
-    const timer = setTimeout(() => setLoading(false), 400);
-    return () => clearTimeout(timer);
   }, []);
 
   const filtered = useMemo(() => {
@@ -182,9 +181,8 @@ export default function Shop() {
       default:
         list = [...list].sort((a, b) => b.id - a.id);
     }
-
     return list;
-  }, [activeFilter, sortBy]);
+  }, [products, activeFilter, sortBy]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -213,7 +211,7 @@ export default function Shop() {
             className="text-muted-foreground text-lg max-w-xl mx-auto"
           >
             Every piece is made by hand, with heart. Discover your perfect hair
-            companion from {products.length} adorable styles!
+            companion from {isLoading ? "12" : products.length} adorable styles!
           </motion.p>
         </div>
       </section>
@@ -262,8 +260,18 @@ export default function Shop() {
           </div>
         </div>
 
+        {/* Error state */}
+        {isError && (
+          <div
+            className="bg-destructive/10 text-destructive border border-destructive/20 rounded-xl px-4 py-3 text-sm mb-6"
+            data-ocid="shop-error"
+          >
+            {String(error)} — Showing cached products instead.
+          </div>
+        )}
+
         {/* Product count */}
-        {!loading && (
+        {!isLoading && (
           <p className="text-muted-foreground text-sm mb-6">
             Showing{" "}
             <span className="font-semibold text-foreground">
@@ -283,11 +291,11 @@ export default function Shop() {
         )}
 
         {/* Grid */}
-        {loading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+            {["sk-1", "sk-2", "sk-3", "sk-4", "sk-5", "sk-6"].map((key) => (
+              <SkeletonCard key={key} />
+            ))}
           </div>
         ) : filtered.length === 0 ? (
           <div

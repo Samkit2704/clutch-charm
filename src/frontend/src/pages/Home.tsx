@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -12,12 +13,12 @@ import {
 import { motion } from "motion/react";
 import { useEffect } from "react";
 import { SiInstagram, SiWhatsapp } from "react-icons/si";
-import { featuredProducts } from "../data/products";
+import { useFeaturedProducts } from "../hooks/useQueries";
 import { useCartStore } from "../stores/cart";
 import type { Product } from "../types/product";
 import { setPageMeta } from "../utils/seo";
 
-const WHATSAPP_NUMBER = "923001234567";
+const WHATSAPP_NUMBER = "919876543210";
 const INSTAGRAM_HANDLE = "clutchandcharm";
 
 const STATS = [
@@ -33,12 +34,7 @@ const STATS = [
     label: "Unique Styles",
     color: "text-secondary",
   },
-  {
-    icon: Heart,
-    value: "Handmade",
-    label: "with Love",
-    color: "text-primary",
-  },
+  { icon: Heart, value: "Handmade", label: "with Love", color: "text-primary" },
   {
     icon: CheckCircle,
     value: "100%",
@@ -82,7 +78,6 @@ const INSTAGRAM_TILES = [
 
 function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
-
   return (
     <motion.div
       className="group bg-card rounded-2xl overflow-hidden shadow-subtle hover:shadow-hover transition-smooth border border-border flex flex-col"
@@ -117,7 +112,7 @@ function ProductCard({ product }: { product: Product }) {
         </div>
         <div className="flex items-center justify-between mt-auto pt-2">
           <span className="font-display font-bold text-primary text-base sm:text-lg">
-            ${product.price.toFixed(2)}
+            ₹{product.price}
           </span>
           <div className="flex gap-2">
             <button
@@ -151,7 +146,26 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
+function ProductCardSkeleton() {
+  return (
+    <div className="bg-card rounded-2xl overflow-hidden shadow-subtle border border-border flex flex-col">
+      <Skeleton className="aspect-square w-full rounded-none" />
+      <div className="p-4 flex flex-col gap-2">
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-20" />
+        <div className="flex items-center justify-between pt-2">
+          <Skeleton className="h-6 w-16" />
+          <Skeleton className="h-7 w-16 rounded-full" />
+        </div>
+        <Skeleton className="h-4 w-24 mx-auto mt-1" />
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
+  const { data: featuredProducts, isLoading, isError } = useFeaturedProducts();
+
   useEffect(() => {
     setPageMeta(
       "Handmade Hair Clutchers for Every Style",
@@ -159,13 +173,13 @@ export default function Home() {
     );
   }, []);
 
+  const displayProducts = featuredProducts?.slice(0, 6) ?? [];
+
   return (
     <div className="overflow-x-hidden">
       {/* ── Hero ── */}
       <section className="relative min-h-[92vh] flex items-center overflow-hidden">
-        {/* Full gradient background */}
         <div className="absolute inset-0 gradient-primary opacity-90" />
-        {/* Hero image overlay */}
         <div className="absolute inset-0">
           <img
             src="/assets/generated/hero-girl-hair.dim_1200x600.jpg"
@@ -173,7 +187,6 @@ export default function Home() {
             className="w-full h-full object-cover mix-blend-overlay opacity-30"
           />
         </div>
-        {/* Soft bokeh circles */}
         <div
           className="absolute top-10 right-10 w-72 h-72 rounded-full opacity-20 blur-3xl"
           style={{
@@ -188,7 +201,6 @@ export default function Home() {
               "radial-gradient(circle, oklch(0.90 0.10 50), transparent)",
           }}
         />
-
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <motion.div
@@ -200,7 +212,6 @@ export default function Home() {
                 <Sparkles size={14} className="mr-1.5" />
                 Handcrafted with Love
               </Badge>
-
               <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-primary-foreground leading-[1.1] tracking-tight mb-5">
                 Handmade Hair
                 <br />
@@ -209,13 +220,11 @@ export default function Home() {
                 <span className="italic font-light">Every Style</span>{" "}
                 <span className="not-italic font-extrabold">✨</span>
               </h1>
-
               <p className="text-base sm:text-lg text-primary-foreground/85 leading-relaxed mb-8 max-w-lg">
                 At <strong>Clutch & Charm</strong>, every piece is crafted with
                 love — soft fabrics, dreamy pastels, and a little bit of magic.
                 Made by hand, worn with heart.
               </p>
-
               <div className="flex flex-wrap gap-3">
                 <Button
                   asChild
@@ -247,7 +256,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Floating accent cards */}
             <motion.div
               className="hidden lg:flex flex-col gap-4 items-end"
               initial={{ opacity: 0, x: 40 }}
@@ -280,7 +288,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Wave divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg
             viewBox="0 0 1440 60"
@@ -347,19 +354,45 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {featuredProducts.slice(0, 6).map((product, i) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))}
-          </div>
+          {isError ? (
+            <div
+              className="text-center py-10 text-muted-foreground"
+              data-ocid="featured-error"
+            >
+              <p className="text-4xl mb-3">🌸</p>
+              <p>Couldn't load products. Please refresh to try again.</p>
+            </div>
+          ) : (
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6"
+              data-ocid="featured-products-grid"
+            >
+              {isLoading
+                ? ["sk-0", "sk-1", "sk-2", "sk-3", "sk-4", "sk-5"].map(
+                    (key, i) => (
+                      <motion.div
+                        key={key}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                      >
+                        <ProductCardSkeleton />
+                      </motion.div>
+                    ),
+                  )
+                : displayProducts.map((product, i) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.08 }}
+                    >
+                      <ProductCard product={product} />
+                    </motion.div>
+                  ))}
+            </div>
+          )}
 
           <div className="text-center mt-10">
             <Button
@@ -458,7 +491,6 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* Simulated Instagram grid */}
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 mb-8">
             {INSTAGRAM_TILES.map((tile, i) => (
               <motion.a
@@ -516,7 +548,7 @@ export default function Home() {
               get a special bundle deal — we're always here for you!
             </p>
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20Clutch%20%26%20Charm!%20I'd%20like%20to%20place%20an%20order%20%F0%9F%8C%B8`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20Clutch%20%26%20Charm!%20I%27d%20like%20to%20place%20an%20order%20%F0%9F%8C%B8`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-primary-foreground text-primary font-semibold text-base shadow-elevated hover:bg-primary-foreground/90 transition-smooth"

@@ -25,7 +25,7 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { setPageMeta } from "../utils/seo";
 
-const WHATSAPP_NUMBER = "923001234567";
+const WHATSAPP_NUMBER = "919876543210";
 const INSTAGRAM_HANDLE = "clutchandcharm";
 
 const FAQS = [

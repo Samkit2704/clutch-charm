@@ -9,7 +9,7 @@ const quickLinks = [
   { to: "/contact", label: "Contact" },
 ];
 
-const WHATSAPP_NUMBER = "923001234567";
+const WHATSAPP_NUMBER = "919876543210";
 const INSTAGRAM_HANDLE = "clutchandcharm";
 
 export function Footer() {

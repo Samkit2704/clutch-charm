@@ -5,7 +5,7 @@ import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { useCartStore } from "../stores/cart";
 
-const WHATSAPP_NUMBER = "923001234567";
+const WHATSAPP_NUMBER = "919876543210";
 
 function buildWhatsAppMessage(
   items: ReturnType<typeof useCartStore.getState>["items"],
@@ -13,12 +13,12 @@ function buildWhatsAppMessage(
   const lines = items
     .map(
       (i) =>
-        `• ${i.name} x${i.quantity} — $${(i.price * i.quantity).toFixed(2)}`,
+        `\u2022 ${i.name} x${i.quantity} \u2014 \u20B9${i.price * i.quantity}`,
     )
     .join("\n");
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   return encodeURIComponent(
-    `Hi Clutch & Charm! 🌸 I'd like to order:\n\n${lines}\n\nTotal: $${total.toFixed(2)}\n\nPlease let me know the next steps!`,
+    `Hi Clutch & Charm! \uD83C\uDF38 I'd like to order:\n\n${lines}\n\nTotal: \u20B9${total}\n\nPlease let me know the next steps!`,
   );
 }
 
@@ -127,7 +127,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                         {item.name}
                       </p>
                       <p className="text-sm font-bold text-primary">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ₹{item.price * item.quantity}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <button
@@ -176,7 +176,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Subtotal</span>
                 <span className="font-display font-bold text-lg text-foreground">
-                  ${totalPrice.toFixed(2)}
+                  ₹{totalPrice}
                 </span>
               </div>
               <Separator />
